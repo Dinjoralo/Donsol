@@ -132,4 +132,19 @@ function Board(element)
   {
     
   }
+  
+  document.getElementsByTagName("BODY")[0].onresize = function(){ScaleCardArt()}; // This function is probably better off in another js file, or maybe it's own. Oh well.
+  function ScaleCardArt() {
+    var card = document.getElementsByClassName("face")[0].offsetHeight;    // Get height of the card faces for SVG scaling
+
+    var artScale = (card*0.998)/300; // Much manual fiddling went into finding that very specific number, so that the "queens" line up exactly with the bottom of the card.
+    var nameSize = 12 * artScale;
+    var valueSize = 13 * artScale;
+
+    css.innerHTML = "#board card .face .graphic svg {transform: scale("+ artScale +")}\
+                     #board card .face .name{font-size: " + nameSize + "px}\
+                     #board card .face .value {font-size: " + valueSize + "px}";
+    document.body.appendChild(css);
+  }
+  
 }
