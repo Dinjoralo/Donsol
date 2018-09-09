@@ -1,14 +1,16 @@
-"use strict";
-
 function Board(element)
 {
   this.element = element;
   this.room = [];
+  var css = document.createElement("style");
+  css.type = "text/css";
   
   this.enter_room = function(starting_hand = null)
-  {    
+  {
+    console.log("<room>");
+    
     this.remove_cards();
-  
+    
     if(donsol.deck.cards.length > 0){
       this.add_card(0,donsol.deck.draw_card(starting_hand ? DIAMOND : null));
       setTimeout(()=>{
@@ -78,7 +80,7 @@ function Board(element)
       return;
     }
     if(this.room[0].is_flipped && this.room[1].is_flipped && this.room[2].is_flipped && this.room[3].is_flipped){
-      setTimeout(function(){ donsol.board.is_complete(); }, 250);
+      setTimeout(function(){ donsol.board.is_complete(); }, 1000);
     }
   }
 
@@ -102,7 +104,7 @@ function Board(element)
   
   this.cards_flipped = function()
   {
-    let a = [];
+    var a = [];
     if(this.room[0] && this.room[0].is_flipped){ a.push(this.room[0]); }
     if(this.room[1] && this.room[1].is_flipped){ a.push(this.room[1]); }
     if(this.room[2] && this.room[2].is_flipped){ a.push(this.room[2]); }
@@ -112,7 +114,7 @@ function Board(element)
 
   this.cards_monsters = function()
   {
-    let a = [];
+    var a = [];
     if(this.room[0] && this.room[0].constructor.name == "Card_Monster" && this.room[0].is_flipped === false){ a.push(this.room[0]); }
     if(this.room[1] && this.room[1].constructor.name == "Card_Monster" && this.room[1].is_flipped === false){ a.push(this.room[1]); }
     if(this.room[2] && this.room[2].constructor.name == "Card_Monster" && this.room[2].is_flipped === false){ a.push(this.room[2]); }
@@ -132,7 +134,7 @@ function Board(element)
   {
     
   }
-  
+
   document.getElementsByTagName("BODY")[0].onresize = function(){ScaleCardArt()}; // This function is probably better off in another js file, or maybe it's own. Oh well.
   function ScaleCardArt() {
     var card = document.getElementsByClassName("face")[0].offsetHeight;    // Get height of the card faces for SVG scaling
@@ -140,11 +142,15 @@ function Board(element)
     var artScale = (card*0.998)/300; // Much manual fiddling went into finding that very specific number, so that the "queens" line up exactly with the bottom of the card.
     var nameSize = 12 * artScale;
     var valueSize = 13 * artScale;
+    var shortcutSize = 14 * artScale;
 
-    css.innerHTML = "#board card .face .graphic svg {transform: scale("+ artScale +")}\
+    css.innerHTML = "#board card .face .graphic svg {transform: scale3d("+ artScale +"," + artScale + "," +artScale +")}\
+                     #board card .face .icon {transform: scale3d("+ artScale +"," + artScale + "," +artScale +")}\
                      #board card .face .name{font-size: " + nameSize + "px}\
-                     #board card .face .value {font-size: " + valueSize + "px}";
+                     #board card .face .value {font-size: " + valueSize + "px}\
+                     #table card .shortcut {font-size: " + shortcutSize + "px}";
     document.body.appendChild(css);
   }
   
 }
+
