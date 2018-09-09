@@ -14,7 +14,7 @@ body { background:black; font-family: 'input_mono_regular',monospace; min-width:
 
 #player.locked a.escape { display:none;}
 #board, #table { display:block; position: absolute; margin-top: 15px; width: 100%; height:calc(100% - 50px);} /* height calc takes wrapper margin into account. Needed for first card to animate on hover with % units */
-#board card, #table card { display: inline-block !important;height: 31.25vw;width: 22%; margin-right: 15px; border-radius: 7px; position:relative; overflow:hidden;min-height: 300px; } /* Again, height in vw here is a simple, bad way to enforce aspect ratio */
+#board card, #table card { display: inline-block !important;height: 31.25vw;width: 22%; margin-right: 15px; border-radius: 7px; position:absolute; overflow:hidden;min-height: 300px; } /* Again, height in vw here is a simple, bad way to enforce aspect ratio */
 #board card { top:10px; opacity:0.01; z-index:900; transition: opacity 250ms, top 150ms;}
 #board card:hover { cursor:pointer; top:2% !important;}
 #board card .face { display:block;width: 100%;height:98%;border-radius: 7px;}
