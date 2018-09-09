@@ -19,9 +19,9 @@ body { background:black; font-family: 'input_mono_regular',monospace; min-width:
 #board card:hover { cursor:pointer; top:2% !important;}
 #board card .face { display:block;width: 100%;height:98%;border-radius: 7px;}
 #board card .face img {position: absolute;bottom:0px; } /*Neither of these settings seem to do anything? */
-#board card .face .value   { display: block;position: absolute;width: 30px;height: 30px;left: 5%;top: calc(40px + 5%);font-size: 12px;text-align: center;} /* Font scaling handled via javascript function in board.js */
+#board card .face .value   { display: block;position: absolute;width: 30px;height: 30px;left: 5%;top: calc(40px + 3.333%);font-size: 12px;text-align: center;} /* Font scaling handled via javascript function in board.js */
 #board card .face .graphic svg { display: block;position: absolute; left: calc(50% - 100px);top:calc(50% - 150px - 0.77%);transform: scale(0.978)} /* The scale here is so there's no jump from original to calculated size when resizing window. Scaling handled by function in board.js */
-#board card .face .icon    { display: block;position: absolute;width: 30px;height: 30px;left: 5%;top: 5%;font-size: 11px; z-index:900;}
+#board card .face .icon    { display: block;position: absolute;width: 30px;height: 30px;left: 5%;top: 3.333%;font-size: 11px; z-index:900;}
 #board card .face .name    { display: block;position: absolute;bottom: 4%;text-align: center;font-size: 12px;width: 100%;}
 
 #table card { }
