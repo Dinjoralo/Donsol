@@ -1,92 +1,156 @@
-body { background:black; font-family: 'input_mono_regular',monospace; min-width:750px; overflow-y: hidden; user-select: none; cursor: default; }
+function Board(element)
+{
+  this.element = element;
+  this.room = [];
+  var css = document.createElement("style");
+  css.type = "text/css";
+  
+  this.enter_room = function(starting_hand = null)
+  {
+    console.log("<room>");
+    
+    this.remove_cards();
+    
+    if(donsol.deck.cards.length > 0){
+      this.add_card(0,donsol.deck.draw_card(starting_hand ? DIAMOND : null));
+      setTimeout(()=>{
+        this.room[0].element.style.opacity = 1
+        this.room[0].element.style.top = 0
+        donsol.speaker.play_effect("click2");
+      },100);
+    }
+    if(donsol.deck.cards.length > 0){
+      this.add_card(1,donsol.deck.draw_card(starting_hand ? CLOVE : null));
+      setTimeout(()=>{
+        this.room[1].element.style.opacity = 1
+        this.room[1].element.style.top = 0
+        donsol.speaker.play_effect("click2");
+      },150);
+    }
+    if(donsol.deck.cards.length > 0){
+      this.add_card(2,donsol.deck.draw_card(starting_hand ? HEART : null));
+      setTimeout(()=>{
+        this.room[2].element.style.opacity = 1
+        this.room[2].element.style.top = 0
+        donsol.speaker.play_effect("click2");
+      },200);
+    }
+    if(donsol.deck.cards.length > 0){
+      this.add_card(3,donsol.deck.draw_card(starting_hand ? SPADE : null));
+      setTimeout(()=>{
+        this.room[3].element.style.opacity = 1
+        this.room[3].element.style.top = 0
+        donsol.speaker.play_effect("click2");
+      },250);
+    }
+    
+    donsol.player.update();
+    this.update();
+  }
+  
+  this.add_card = function(index,card)
+  {
+    this.element.appendChild(card.install());
+    this.room.push(card);
+  }
+  
+  this.remove_cards = function()
+  {
+    this.room = [];
+    this.element.innerHTML = '';
+  }
+  
+  this.return_cards = function()
+  {
+    if(!this.room[0].is_flipped){ donsol.deck.return_card(this.room[0]); }
+    if(!this.room[1].is_flipped){ donsol.deck.return_card(this.room[1]); }
+    if(!this.room[2].is_flipped){ donsol.deck.return_card(this.room[2]); }
+    if(!this.room[3].is_flipped){ donsol.deck.return_card(this.room[3]); }
+  }
 
-#wrapper { display: block; height: calc(25vw * 1.25 + 90px); margin:50px auto; margin-left: 3vw; position: relative; width: calc(97vw);} /* The height is made in vw units as a (bad) way to maintain aspect ratio. This needs to be replaced, Javascript likely required. */
+  this.update = function()
+  {
+    // Don't draw if the player is dead
+    if(donsol.player.health.value < 1){
+      return;
+    }
 
-#player { display: block; font-size:12px; height:30px; line-height:20px; -webkit-user-select: none;-webkit-app-region: drag; padding-top: 100px;margin-top: -120px;}
-#player .gage { width: 120px;display: block;height:30px;position: relative; float:right; margin-right: 2%;}
-#player .gage .value { display: inline-block;line-height: 20px;font-family: 'input_mono_medium';padding-left: 5px;}
-#player .gage .event { display: inline-block;position: absolute;top: -20px;left: 0px; transition: all 250ms; opacity: 0; margin-left:5px;}
-#player .gage .progress { display: inline-block !important;width: 40px;position: relative; top:-3px;overflow: hidden;height: 4px;border-radius: 20px;left:15px;}
-#player .gage .progress .bar{ height:5px; display:block !important; transition: width 300ms}
-#player a.escape { -webkit-app-region: no-drag;padding: 0px 8px;border-radius: 20px;display: inline-block;margin-right: 10px;line-height: 20px; border:2px solid white; margin-top:-2px; color:white;}
-#player a.escape:hover { cursor: pointer; }
-#player div#timeline { display: inline-block;color:white; transition: opacity 250ms; opacity: 0 }
+    if(donsol.player.experience.value === donsol.player.experience.limit){
+      this.dungeon_complete();
+      return;
+    }
+    if(this.room[0].is_flipped && this.room[1].is_flipped && this.room[2].is_flipped && this.room[3].is_flipped){
+      setTimeout(function(){ donsol.board.is_complete(); }, 1000);
+    }
+  }
 
-#player.locked a.escape { display:none;}
-#board, #table { display:block; position: absolute; margin-top: 15px; width: 100%; height:calc(100% - 50px);} /* height calc takes wrapper margin into account. Needed for first card to animate on hover with % units */
-#board card, #table card { display: inline-block !important;height: 31.25vw;width: 22%;margin-right: 15px; margin-left: calc(3%-15px); border-radius: 7px; position:relative; overflow:hidden;min-height: 300px; } /* Again, height in vw here is a simple, bad way to enforce aspect ratio */
-#board card { top:10px; opacity:0.01; z-index:900; transition: opacity 250ms, top 150ms;}
-#board card:hover { cursor:pointer; top:2% !important;}
-#board card .face { display:block;width: 100%;height:98%;border-radius: 7px;}
-#board card .face img {position: absolute;bottom:0px; } /*Neither of these settings seem to do anything? */
-#board card .face .value   { display: block;position: absolute;width: 30px;height: 30px;left: 5%;top: calc(40px + 3.333%);font-size: 12px;text-align: center;} /* Font scaling handled via javascript function in board.js */
-#board card .face .graphic svg { display: block;position: absolute; left: calc(50% - 100px);top:calc(50% - 150px - 0.77%);transform: scale(0.978)} /* The scale here is so there's no jump from original to calculated size when resizing window. Scaling handled by function in board.js */
-#board card .face .icon    { display: block;position: absolute;width: 30px;height: 30px;left: 5%;top: 3.333%;font-size: 11px; z-index:900;}
-#board card .face .name    { display: block;position: absolute;bottom: 4%;text-align: center;font-size: 12px;width: 100%;}
+  // Checks
+  
+  this.is_complete = function()
+  {
+    donsol.player.has_escaped = false;
+    this.enter_room();
+  }
 
-#table card { }
-#table card .shortcut { position:absolute; right:20px; bottom:15px; color:#555;}
+  this.is_started = function()
+  {
+    return this.cards_flipped().length > 0
+  }
 
-#board card:nth-child(1), #table card:nth-child(1) { position:relative;}
-#board card:nth-child(2), #table card:nth-child(2) { position:absolute; left:25%;}
-#board card:nth-child(3), #table card:nth-child(3) { position:absolute; left:50%;}
-#board card:nth-child(4), #table card:nth-child(4) { position:absolute; left:75%;}
+  this.has_monsters = function()
+  {
+    return this.cards_monsters().length > 0;
+  }
+  
+  this.cards_flipped = function()
+  {
+    var a = [];
+    if(this.room[0] && this.room[0].is_flipped){ a.push(this.room[0]); }
+    if(this.room[1] && this.room[1].is_flipped){ a.push(this.room[1]); }
+    if(this.room[2] && this.room[2].is_flipped){ a.push(this.room[2]); }
+    if(this.room[3] && this.room[3].is_flipped){ a.push(this.room[3]); }
+    return a;
+  }
 
-#tips { position: fixed;bottom: 3%;font-size: 12px;width: calc(97vw - 3%);}
-#tips a:hover { color:white;}
+  this.cards_monsters = function()
+  {
+    var a = [];
+    if(this.room[0] && this.room[0].constructor.name == "Card_Monster" && this.room[0].is_flipped === false){ a.push(this.room[0]); }
+    if(this.room[1] && this.room[1].constructor.name == "Card_Monster" && this.room[1].is_flipped === false){ a.push(this.room[1]); }
+    if(this.room[2] && this.room[2].constructor.name == "Card_Monster" && this.room[2].is_flipped === false){ a.push(this.room[2]); }
+    if(this.room[3] && this.room[3].constructor.name == "Card_Monster" && this.room[3].is_flipped === false){ a.push(this.room[3]); }
+    return a;
+  }
+  
+  this.dungeon_complete = function()
+  {
+    donsol.is_complete = true;
+    donsol.player.escape_button.innerHTML = "Restart";
+    donsol.player.element.setAttribute("class","done");
+    donsol.timeline.add_event("Completed dungeon!");
+  }
+  
+  this.dungeon_failed = function()
+  {
+    
+  }
 
-#difficulty:hover { text-decoration: underline; cursor: pointer; }
+  document.getElementsByTagName("BODY")[0].onresize = function(){ScaleCardArt()}; // This function is probably better off in another js file, or maybe it's own. Oh well.
+  function ScaleCardArt() {
+    var card = document.getElementsByClassName("face")[0].offsetHeight;    // Get height of the card faces for SVG scaling
 
-/* THEME */
+    var artScale = (card*0.998)/300; // Much manual fiddling went into finding that very specific number, so that the "queens" line up exactly with the bottom of the card.
+    var nameSize = 12 * artScale;
+    var valueSize = 13 * artScale;
+    var shortcutSize = 14 * artScale;
 
-body { background:var(--background) !important };
-.fh { color:var(--f_high) !important; stroke:var(--f_high) !important };
-.fm { color:var(--f_med) !important ; stroke:var(--f_med) !important };
-.fl { color:var(--f_low) !important ; stroke:var(--f_low) !important };
-.f_inv { color:var(--f_inv) !important ; stroke:var(--f_inv) !important };
-.bh { background:var(--b_high) !important; fill:var(--b_high) !important };
-.bm { background:var(--b_med) !important ; fill:var(--b_med) !important };
-.bl { background:var(--b_low) !important ; fill:var(--b_low) !important };
-.b_inv { background:var(--b_inv) !important ; fill:var(--b_inv) !important };
-.b { background:var(--background) !important; }
-
-svg .fill_red { fill:var(--b_inv) !important }
-#board card.heart .face { color:var(--b_inv) !important;}
-#board card.diamond .face { color:var(--b_inv) !important;}
-
-svg .fill_white { fill:var(--b_high) !important }
-#player a.escape { border:2px solid var(--b_high) !important; color: var(--b_high); }
-#player a.escape:hover { background-color:var(--b_high) !important; color:var(--background); }
-#board card .face { background:var(--b_high)}
-.card_11 .face .name,.card_13 .face .name,.card_15 .face .name,.card_17 .face .name { color:var(--b_high);}
-#player .gage { color:var(--b_high) }
-
-svg .fill_black { fill:var(--b_med) !important }
-#board card.clove .face { color:var(--b_med) !important;}
-#board card.spade .face { color:var(--b_med) !important;}
-#board card.joker .face { color:var(--b_med) !important;}
-
-svg .stroke_white { stroke:var(--b_high) !important }
-svg .stroke_black { stroke:var(--b_med) !important }
-svg .stroke_grey { stroke:var(--f_low) !important }
-svg .fill_grey { fill:var(--f_low) !important }
-
-#table card { background:var(--b_low) !important}
-#player .gage .value .unit { color:var(--b_low) !important}
-#player .gage .progress { background:var(--b_low) !important }
-#tips { color: var(--b_low) !important }
-#tips .key { color: var(--b_high) !important }
-
-/* EXTRAS*/
-#player .gage.health .progress .bar { background:var(--b_inv) !important  }
-#player .gage.shield .progress .bar { background:var(--b_high) !important  }
-#player .gage.experience .progress .bar { background:var(--b_med) !important  }
-#table card .shortcut { color:var(--background) !important}
-#difficulty { color:var(--f_high) !important  }
-
-/* DEATH*/
-
-#player.death a.escape { border-color:var(--b_inv) !important;  }
-#player.death a.escape:hover { background-color:var(--b_inv) !important;  }
-
+    css.innerHTML = "#board card .face .graphic svg {transform: scale3d("+ artScale +"," + artScale + "," +artScale +")}\
+                     #board card .face .icon {transform: scale3d("+ artScale +"," + artScale + "," +artScale +")}\
+                     #board card .face .name{font-size: " + nameSize + "px}\
+                     #board card .face .value {font-size: " + valueSize + "px}\
+                     #table card .shortcut {font-size: " + shortcutSize + "px}";
+    document.body.appendChild(css);
+  }
+  
+}
 
